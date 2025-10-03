@@ -41,8 +41,8 @@ export default function Create() {
                         <input
                             type="number"
                             className="w-full border px-3 py-2 rounded"
-                            value={price}
-                            onChange={(e) => setPrice(e.target.value)}
+                            value={goal}
+                            onChange={(e) => setGoal(e.target.value)}
                             required
                         />
                     </div>

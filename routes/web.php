@@ -20,8 +20,8 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/story', [StoryController::class, 'create'])->name('story.create');
-    Route::get('/story', [StoryController::class, 'create'])->name('story.create');
+    Route::get('/story/create', [StoryController::class, 'create'])->name('story.create');
+    /* Route::get('/story', [StoryController::class, 'create'])->name('story.create'); */
     Route::post('/story', [StoryController::class, 'store'])->name('story.store');
     Route::get('/story/{id}/edit', [StoryController::class, 'edit'])->name('story.edit');
     Route::put('/story/{id}', [StoryController::class, 'update'])->name('story.update');

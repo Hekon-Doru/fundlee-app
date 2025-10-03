@@ -36,6 +36,12 @@ export default function AuthenticatedLayout({ header, children }) {
                                 >
                                     Create Story
                                 </NavLink>
+                                <NavLink
+                                    href={route('story.list')}
+                                    active={route().current('stories')}
+                                >
+                                    Story List
+                                </NavLink>
                                 
                             </div>
                         </div>
