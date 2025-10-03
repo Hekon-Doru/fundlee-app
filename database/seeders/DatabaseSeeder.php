@@ -41,14 +41,24 @@ class DatabaseSeeder extends Seeder
         ]);
 
         User::factory(10)->create()->each(function ($user) {
-            // Create approved + pending stories
+            // Create stories
             Story::factory()->approved()->count(2)->create(['user_id' => $user->id]);
             Story::factory()->pending()->count(1)->create(['user_id' => $user->id]);
+            Story::factory()->rejected()->count(1)->create(['user_id' => $user->id]);
 
             // Donations on approved stories
             $approvedStories = $user->stories()->approved()->get();
+
             foreach ($approvedStories as $story) {
-                Donation::factory(5)->create(['story_id' => $story->id]);
+                // Create random donations for this story
+                Donation::factory(rand(3, 8))->create([
+                    'story_id' => $story->id,
+                ]);
+
+                // After seeding donations, update collected_amount
+                $story->update([
+                    'collected_amount' => $story->donations()->sum('amount'),
+                ]);
             }
         });
     }
