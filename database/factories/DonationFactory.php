@@ -12,14 +12,16 @@ class DonationFactory extends Factory
     protected $model = Donation::class;
 
     public function definition(): array
-    {
-        return [
-            'story_id' => Story::factory(), // will create a story if none exists
-            'user_id' => $this->faker->boolean(70) // 70% chance donation is from a registered user
-                ? User::factory()
-                : null,
-            'donor_name' => $this->faker->name(),
-            'amount' => $this->faker->randomFloat(2, 20, 200), // donation between 20 and 200
-        ];
-    }
+{
+    return [
+        'story_id' => Story::factory(), // creates a story if none exists
+        'user_id' => $this->faker->boolean(70)
+            ? User::factory()
+            : null,
+        'donor_name' => $this->faker->name(),
+        'amount' => $this->faker->randomFloat(2, 20, 200), // donation between 20 and 200
+        'comment' => $this->faker->optional()->sentence(6), // random short comment or null
+    ];
+}
+
 }

@@ -16,7 +16,30 @@ class StoryController extends Controller
 
     public function store(Request $request)
     {
-        return Inertia::send('Story/Create', $request->all());
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'target_amount' => 'required|numeric|min:1',
+            'description' => 'required|string',
+            'image' => 'nullable|image|max:2048',
+        ]);
+
+        $story = $request->user()->stories()->create([
+            'title' => $request->title,
+            'target_amount' => $request->target_amount,
+            'description' => $request->description,
+        ]);
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('public/story_images');
+            $story->update(['image' => $path]);
+        }
+
+        return redirect()->route('story.list')->with('success', 'Story created!');
+    }
+
+    public function show($id)
+    {
+        return Inertia::render('Story/Show', ['id' => $id]);
     }
 
     public function edit($id)

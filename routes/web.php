@@ -20,16 +20,19 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    
     Route::get('/story/create', [StoryController::class, 'create'])->name('story.create');
-    /* Route::get('/story', [StoryController::class, 'create'])->name('story.create'); */
-    Route::post('/story', [StoryController::class, 'store'])->name('story.store');
+    
+    Route::get('/stories', [StoryController::class, 'list'])->name('story.list');
+    
+    Route::post('/story', [StoryController::class, 'store'])->middleware('auth');
+    Route::get('/story', [StoryController::class, 'store'])->name('story.store');
     Route::get('/story/{id}/edit', [StoryController::class, 'edit'])->name('story.edit');
     Route::put('/story/{id}', [StoryController::class, 'update'])->name('story.update');
     Route::delete('/story/{id}', [StoryController::class, 'destroy'])->name('story.destroy');
     Route::get('/story/{id}', [StoryController::class, 'view'])->name('story.view');
-    Route::get('/stories', [StoryController::class, 'list'])->name('story.list');
-
     
+ 
     
    
 });
