@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\StoryController;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -18,9 +19,20 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::get('/story', function () {
-    return Inertia::render('Story');
-})->middleware(['auth', 'verified'])->name('story');
+Route::middleware('auth')->group(function () {
+    Route::get('/story', [StoryController::class, 'create'])->name('story.create');
+    Route::get('/story', [StoryController::class, 'create'])->name('story.create');
+    Route::post('/story', [StoryController::class, 'store'])->name('story.store');
+    Route::get('/story/{id}/edit', [StoryController::class, 'edit'])->name('story.edit');
+    Route::put('/story/{id}', [StoryController::class, 'update'])->name('story.update');
+    Route::delete('/story/{id}', [StoryController::class, 'destroy'])->name('story.destroy');
+    Route::get('/story/{id}', [StoryController::class, 'view'])->name('story.view');
+    Route::get('/stories', [StoryController::class, 'list'])->name('story.list');
+
+    
+    
+   
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
