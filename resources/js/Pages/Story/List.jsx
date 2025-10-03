@@ -1,8 +1,14 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Link } from "@inertiajs/react";
+import { Link, useForm } from "@inertiajs/react";
 import ProgressBar from "./Partials/ProgresBar";
 
-export default function List({ stories }) {
+export default function List({ stories, csrf }) {
+    const { put } = useForm();
+
+    const handleToggle = (storyId) => {
+        put(route("story.toggle", storyId)); // route should be defined in Laravel
+    };
+
     return (
         <AuthenticatedLayout
             user={{ name: "User" }}
@@ -16,24 +22,21 @@ export default function List({ stories }) {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {stories.length > 0 ? (
                         stories.map((story) => (
-                            <Link 
-                                href={route("story.view", story.id)}
-                                key={story.id}
-                                className="no-underline"
-                            >
-                                <div className="h-full bg-white rounded-lg shadow p-4">
+                            <div key={story.id} className="relative h-full bg-white rounded-lg shadow p-4">
+                                <Link 
+                                    href={route("story.view", story.id)}
+                                    className="no-underline"
+                                >
                                     <div className="w-full h-64 bg-gray-300 rounded-lg flex items-center justify-center mb-4">
-                                        <span className="text-gray-500 text-sm">
-                                            {story.image ? (
-                                                <img
-                                                    src={story.image}
-                                                    alt={story.title}
-                                                    className="w-full h-full object-cover rounded-lg"
-                                                />
-                                            ) : (
-                                                "Image"
-                                            )}
-                                        </span>
+                                        {story.image ? (
+                                            <img
+                                                src={story.image}
+                                                alt={story.title}
+                                                className="w-full h-full object-cover rounded-lg"
+                                            />
+                                        ) : (
+                                            <span className="text-gray-500 text-sm">Image</span>
+                                        )}
                                     </div>
 
                                     <div className="align-baseline flex flex-col h-28">
@@ -41,13 +44,25 @@ export default function List({ stories }) {
                                             {story.title}
                                         </h3>
 
-                                          <ProgressBar
-                                                collected_amount={story.collected_amount}
-                                                target_amount={story.target_amount}
-                                          />
-                                        </div>
-                                </div>
-                            </Link>
+                                        <ProgressBar
+                                            collected_amount={story.collected_amount}
+                                            target_amount={story.target_amount}
+                                        />
+                                    </div>
+                                </Link>
+
+                                {/* Toggle button for owner */}
+                                {story.is_owner && (
+                                    <button
+                                        onClick={() => handleToggle(story.id)}
+                                        className={`absolute top-4 right-4 px-3 py-1 rounded text-sm font-medium
+                                            ${story.is_active ? "bg-green-500 text-white" : "bg-gray-400 text-black"}
+                                        `}
+                                    >
+                                        {story.is_active ? "Active" : "Inactive"}
+                                    </button>
+                                )}
+                            </div>
                         ))
                     ) : (
                         <div className="col-span-3 text-gray-500">
