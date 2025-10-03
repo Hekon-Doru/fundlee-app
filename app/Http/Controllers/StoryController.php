@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Story;
+use Illuminate\Support\Facades\Auth;
 
 class StoryController extends Controller
 {
@@ -67,10 +68,27 @@ class StoryController extends Controller
     }
 
     public function list()
-    {
+{
+    $user = Auth::user();
+
+    if ($user && $user->role === 'admin') {
+        // Admin sees all stories
+        $stories = Story::all();
+    } else {
+        // Regular users see only approved stories
         $stories = Story::approved()->get();
-        return Inertia::render('Story/List', [
-            'stories' => $stories,
-        ]);
     }
+
+    // Attach is_owner flag to each story
+    $stories = $stories->map(function ($story) use ($user) {
+        $story->is_owner = $user && $story->user_id === $user->id;
+        return $story;
+    });
+
+    return Inertia::render('Story/List', [
+        'stories' => $stories,
+        'user_id' => $user ? $user->id : null,
+        'is_admin' => $user ? $user->role === 'admin' : false,
+    ]);
+}
 }
