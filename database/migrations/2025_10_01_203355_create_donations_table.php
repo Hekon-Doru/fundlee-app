@@ -22,6 +22,7 @@ return new class extends Migration {
             $table->string('donor_name');
             $table->decimal('amount', 12, 2);
             $table->timestamps();
+            $table->text('comment')->nullable();
         });
 
     }

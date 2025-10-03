@@ -1,5 +1,6 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Link } from "@inertiajs/react";
+import ProgressBar from "./Partials/ProgresBar";
 
 export default function List({ stories }) {
     return (
@@ -15,8 +16,8 @@ export default function List({ stories }) {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {stories.length > 0 ? (
                         stories.map((story) => (
-                            <Link
-                                to={route("story.view", story.id)}
+                            <Link 
+                                href={route("story.view", story.id)}
                                 key={story.id}
                                 className="no-underline"
                             >
@@ -40,29 +41,11 @@ export default function List({ stories }) {
                                             {story.title}
                                         </h3>
 
-                                        <div className="mt-auto">
-                                            <div className="flex justify-between mb-1 text-sm">
-                                                <span>Collected</span>
-                                                <span>
-                                                    €{story.collected_amount} /
-                                                    €{story.target_amount}
-                                                </span>
-                                            </div>
-
-                                            <div className="bg-gray-200 rounded-full h-4">
-                                                <div
-                                                    className="bg-green-600 green-700 h-4 rounded-full"
-                                                    style={{
-                                                        width: `${Math.round(
-                                                            (story.collected_amount /
-                                                                story.target_amount) *
-                                                                100
-                                                        )}%`,
-                                                    }}
-                                                ></div>
-                                            </div>
+                                          <ProgressBar
+                                                collected_amount={story.collected_amount}
+                                                target_amount={story.target_amount}
+                                          />
                                         </div>
-                                    </div>
                                 </div>
                             </Link>
                         ))

@@ -36,17 +36,17 @@ class StoryController extends Controller
 
     public function view($id)
     {
-        $story = Story::with('contributors')->findOrFail($id);
+        $story = Story::with('donations')->findOrFail($id);
 
-        return inertia('Story/View', [
+        return Inertia::render('Story/View', [
             'story' => $story,
         ]);
     }
 
     public function list()
     {
-        $stories = Story::all();
-        return inertia('Story/List', [
+        $stories = Story::approved()->get();
+        return Inertia::render('Story/List', [
             'stories' => $stories,
         ]);
     }

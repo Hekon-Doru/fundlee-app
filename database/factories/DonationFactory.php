@@ -19,7 +19,7 @@ class DonationFactory extends Factory
                 ? User::factory()
                 : null,
             'donor_name' => $this->faker->name(),
-            'amount' => $this->faker->randomFloat(2, 5, 200), // donation between 5 and 200
+            'amount' => $this->faker->randomFloat(2, 20, 200), // donation between 20 and 200
         ];
     }
 }
