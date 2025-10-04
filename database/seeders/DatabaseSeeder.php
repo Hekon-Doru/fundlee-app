@@ -30,14 +30,14 @@ class DatabaseSeeder extends Seeder
             'name' => 'User',
             'email' => 'User@gmail.com',
             'password' => Hash::make('User'),
-            'role' => 'User',
+            'role' => 'user',
         ]);
 
         DB::table('users')->insert([
             'name' => 'Admin',
             'email' => 'admin@gmail.com',
             'password' => Hash::make('Admin'),
-            'role' => 'Admin',
+            'role' => 'admin',
         ]);
 
         User::factory(10)->create()->each(function ($user) {

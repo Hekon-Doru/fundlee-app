@@ -68,27 +68,30 @@ class StoryController extends Controller
     }
 
     public function list()
-{
-    $user = Auth::user();
+    {
+        $user = Auth::user();
 
-    if ($user && $user->role === 'admin') {
-        // Admin sees all stories
-        $stories = Story::all();
-    } else {
-        // Regular users see only approved stories
-        $stories = Story::approved()->get();
+        if ($user && $user->role === 'admin') {
+            // Admin sees all stories
+            $stories = Story::all();
+        } else {
+            // Regular users see only approved stories
+            $stories = Story::approved()->get();
+        }
+
+        // Attach is_owner flag to each story
+        $stories = $stories->map(function ($story) use ($user) {
+            $story->is_owner = $user && $story->user_id === $user->id;
+            $story->is_pending = $story->status === 'pending';
+            $story->is_approved = $story->status === 'approved';
+            $story->is_rejected = $story->status === 'rejected';
+            return $story;
+        });
+
+        return Inertia::render('Story/List', [
+            'stories' => $stories,
+            'user_id' => $user ? $user->id : null,
+            'is_admin' => $user ? $user->role === 'admin' : false,
+        ]);
     }
-
-    // Attach is_owner flag to each story
-    $stories = $stories->map(function ($story) use ($user) {
-        $story->is_owner = $user && $story->user_id === $user->id;
-        return $story;
-    });
-
-    return Inertia::render('Story/List', [
-        'stories' => $stories,
-        'user_id' => $user ? $user->id : null,
-        'is_admin' => $user ? $user->role === 'admin' : false,
-    ]);
-}
 }
