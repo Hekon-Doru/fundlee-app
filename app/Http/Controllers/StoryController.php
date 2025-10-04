@@ -99,10 +99,16 @@ class StoryController extends Controller
             // Admin sees all stories
             $stories = Story::with('user')->get();
         } else {
-            // Regular users see approved stories + their own stories regardless of status
+            // Regular users or guests
             $stories = Story::with('user')
-                ->where('status', 'approved')
-                ->orWhere('user_id', $user->id)
+                ->when($user, function ($query) use ($user) {
+                    // logged in user: approved + their own stories
+                    $query->where('status', 'approved')
+                        ->orWhere('user_id', $user->id);
+                }, function ($query) {
+                    // guest: only approved stories
+                    $query->where('status', 'approved');
+                })
                 ->get();
         }
 
@@ -120,9 +126,9 @@ class StoryController extends Controller
             'stories' => $stories,
             'user_id' => $user ? $user->id : null,
             'is_admin' => $user ? $user->role === 'admin' : false,
+            'authUser' => $user, // pass the user (can be null) for donation modals
         ]);
     }
-
     public function createDonation(Story $story)
     {
         return Inertia::render('Story/Partials/Donate', [

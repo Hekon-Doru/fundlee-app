@@ -14,7 +14,7 @@ function ProgressBar({ collected_amount, target_amount }) {
 
                 <div className="bg-gray-200 rounded-full h-4">
                     <div
-                        className="bg-green-600 green-700 h-4 rounded-full"
+                        className="bg-green-600 green-700 h-4 rounded-full max-w-full"
                         style={{
                             width: `${Math.round(
                                 (collected_amount / target_amount) * 100

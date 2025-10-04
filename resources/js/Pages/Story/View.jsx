@@ -6,11 +6,13 @@ import ProgressBar from "./Partials/ProgresBar";
 import StatusBar from "./Partials/StatusBar";
 import Contributors from "./Partials/Contributors";
 import StoryActions from "./Partials/StoryActions";
+import Donate from "./Partials/Donate";
 
 export default function View({ story: initialStory, auth }) {
     const Layout = auth.user ? AuthenticatedLayout : GuestLayout;
     const authUser = auth.user;
     const [story, setStory] = useState(initialStory);
+    const [showDonate, setShowDonate] = useState(false);
 
     if (!story) {
         return (
@@ -72,14 +74,12 @@ export default function View({ story: initialStory, auth }) {
                             />
                         </div>
 
-                        {/* Story Actions (Admin, Owner, Donate/Delete) */}
-                        {authUser && (
-                            <StoryActions
-                                story={story}
-                                setStory={setStory}
-                                authUser={authUser}
-                            />
-                        )}
+                        {/* Actions (Donate button included for guests) */}
+                        <StoryActions
+                            story={story}
+                            authUser={authUser}
+                            setShowDonate={setShowDonate}
+                        />
 
                         {/* Story Description */}
                         <div>
@@ -92,7 +92,23 @@ export default function View({ story: initialStory, auth }) {
                 </div>
             </div>
 
+            {/* Contributors */}
             <Contributors story={story} />
+
+            {/* Donate Modal */}
+            {showDonate && (
+                <Donate
+                    story={story}
+                    authUser={authUser}
+                    onClose={() => setShowDonate(false)}
+                    onDonateSuccess={(amount) =>
+                        setStory(prev => ({
+                            ...prev,
+                            collected_amount: Number(prev.collected_amount) + Number(amount),
+                        }))
+                    }
+                />
+            )}
         </Layout>
     );
 }
