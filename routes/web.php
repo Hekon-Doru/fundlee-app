@@ -15,6 +15,8 @@ Route::get('/', function () {
     ]);
 });
 
+Route::get('/stories', [StoryController::class, 'list'])->name('story.list');
+
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -23,7 +25,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/story/create', [StoryController::class, 'create'])->name('story.create');
 
-    Route::get('/stories', [StoryController::class, 'list'])->name('story.list');
+    /* Route::get('/stories', [StoryController::class, 'list'])->name('story.list'); */
 
     Route::post('/story', [StoryController::class, 'store'])->middleware('auth');
     Route::get('/story', [StoryController::class, 'store'])->name('story.store');
