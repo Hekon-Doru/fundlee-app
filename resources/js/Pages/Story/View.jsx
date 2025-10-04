@@ -24,6 +24,9 @@ export default function View({ story: initialStory, auth }) {
         );
     }
 
+    // Use image_path or fallback
+    const imageSrc = story.image_path || "/images/placeholder.png";
+
     return (
         <Layout
             user={authUser ? { name: authUser.name } : null}
@@ -48,20 +51,15 @@ export default function View({ story: initialStory, auth }) {
                     {/* Story Image */}
                     <div className="w-full lg:w-7/12 h-64 lg:h-[500px] bg-gray-300 rounded-lg flex items-center justify-center overflow-hidden relative">
                         <StatusBar story={story} authUser={authUser} />
-                        {story.image ? (
-                            <img
-                                src={story.image}
-                                alt={story.title}
-                                className="w-full h-full object-cover"
-                            />
-                        ) : (
-                            <span className="text-gray-500 text-sm">Image</span>
-                        )}
+                        <img
+                            src={imageSrc}
+                            alt={story.title}
+                            className="w-full h-full object-cover"
+                        />
                     </div>
 
                     {/* Story Info */}
                     <div className="w-full lg:w-5/12 flex flex-col gap-4">
-                        {/* Owner & Progress */}
                         <div>
                             <div className="flex items-center text-gray-700 text-sm mb-2">
                                 <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
@@ -83,9 +81,7 @@ export default function View({ story: initialStory, auth }) {
 
                         {/* Story Description */}
                         <div>
-                            <h3 className="mt-6 text-lg font-semibold mb-2">
-                                {story.title}
-                            </h3>
+                            <h3 className="mt-6 text-lg font-semibold mb-2">{story.title}</h3>
                             <p className="text-gray-600">{story.description}</p>
                         </div>
                     </div>

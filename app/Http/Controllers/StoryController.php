@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Story;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class StoryController extends Controller
 {
@@ -33,6 +34,19 @@ class StoryController extends Controller
 
     public function store(Request $request)
     {
+        /* $file = $request->file('image');
+        if ($file) {
+            dd([
+                'originalName' => $file->getClientOriginalName(),
+                'mimeType' => $file->getClientMimeType(),
+                'size' => $file->getSize(),
+                'isValid' => $file->isValid(),
+            ]);
+        } else {
+            dd('No file uploaded');
+        }
+ */
+
         $request->validate([
             'title' => 'required|string|max:255',
             'target_amount' => 'required|numeric|min:1',
@@ -47,9 +61,16 @@ class StoryController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('public/story_images');
-            $story->update(['image_path' => $path]);
+            // Store in storage/app/public/story_images
+            $path = $request->file('image')->store('story_images', 'public');
+
+            // Save only the relative path in DB
+            $story->update([
+                'image_path' => '/storage/' . $path, // This generates: /storage/story_images/filename.jpg
+            ]);
         }
+
+
 
         return redirect()->route('story.list')->with('success', 'Story created!');
     }
@@ -78,13 +99,17 @@ class StoryController extends Controller
     {
         $story = Story::with(['donations', 'user'])->findOrFail($id);
 
-        // Add owner property
-        $story = Story::with(['donations', 'user'])->findOrFail($id);
+        // Owner info
         $story->owner = $story->user ? $story->user->name : 'Anonymous';
         $story->user_id = $story->user ? $story->user->id : null;
+
+        // Status flags
         $story->is_pending = $story->status === 'pending';
         $story->is_approved = $story->status === 'approved';
         $story->is_rejected = $story->status === 'rejected';
+
+        // Image URL
+        $story->image_url = $story->image_path ? asset($story->image_path) : null;
 
         return Inertia::render('Story/View', [
             'story' => $story,
@@ -95,22 +120,16 @@ class StoryController extends Controller
     {
         $user = Auth::user();
 
-        if ($user && $user->role === 'admin') {
-            // Admin sees all stories
-            $stories = Story::with('user')->get();
-        } else {
-            // Regular users or guests
-            $stories = Story::with('user')
-                ->when($user, function ($query) use ($user) {
-                    // logged in user: approved + their own stories
-                    $query->where('status', 'approved')
-                        ->orWhere('user_id', $user->id);
-                }, function ($query) {
-                    // guest: only approved stories
-                    $query->where('status', 'approved');
-                })
-                ->get();
-        }
+        $stories = Story::with('user')
+            ->when($user, function ($query) use ($user) {
+                // Authenticated user: approved stories + own stories
+                $query->where('status', 'approved')
+                    ->orWhere('user_id', $user->id);
+            }, function ($query) {
+                // Guest: only approved stories
+                $query->where('status', 'approved');
+            })
+            ->get();
 
         // Map stories with helper properties
         $stories = $stories->map(function ($story) use ($user) {
@@ -119,6 +138,10 @@ class StoryController extends Controller
             $story->is_pending = $story->status === 'pending';
             $story->is_approved = $story->status === 'approved';
             $story->is_rejected = $story->status === 'rejected';
+
+            // Image URL for frontend
+            $story->image_url = $story->image_path ? asset($story->image_path) : null;
+
             return $story;
         });
 
@@ -126,9 +149,10 @@ class StoryController extends Controller
             'stories' => $stories,
             'user_id' => $user ? $user->id : null,
             'is_admin' => $user ? $user->role === 'admin' : false,
-            'authUser' => $user, // pass the user (can be null) for donation modals
+            'authUser' => $user, // pass user for donation modals
         ]);
     }
+
     public function createDonation(Story $story)
     {
         return Inertia::render('Story/Partials/Donate', [
