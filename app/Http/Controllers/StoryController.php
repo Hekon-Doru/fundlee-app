@@ -16,30 +16,18 @@ class StoryController extends Controller
     }
 
     public function updateStatus(Request $request, Story $story)
-    {
-        $user = $request->user();
+{
+    $request->validate([
+        'status' => 'required|in:pending,approved,rejected',
+    ]);
 
-        // Only admin can update status
-        if (!$user || $user->role !== 'admin') {
-            abort(403, 'Unauthorized');
-        }
+    $story->update(['status' => $request->status]);
 
-        $request->validate([
-            'status' => 'required|in:pending,approved,rejected',
-        ]);
+    /* dd($request->all()); */
 
-        $story->status = $request->status;
-        $story->save();
+    return back()->with('success', 'Story status updated.');
+}
 
-        // Return the updated story so frontend can re-render
-        $story->owner = $story->user ? $story->user->name : 'Anonymous';
-        $story->is_owner = $user->id === $story->user_id;
-        $story->is_pending = $story->status === 'pending';
-        $story->is_approved = $story->status === 'approved';
-        $story->is_rejected = $story->status === 'rejected';
-
-        return redirect()->back()->with('success', 'Story status updated!');
-    }
 
 
 

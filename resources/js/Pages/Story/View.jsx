@@ -10,9 +10,6 @@ import StoryActions from "./Partials/StoryActions";
 export default function View({ story: initialStory, auth }) {
     const Layout = auth.user ? AuthenticatedLayout : GuestLayout;
     const authUser = auth.user;
-    const isAdmin = authUser?.role === "admin";
-
-    // Use state so we can update the story status dynamically
     const [story, setStory] = useState(initialStory);
 
     if (!story) {
@@ -38,8 +35,7 @@ export default function View({ story: initialStory, auth }) {
                             >
                                 All Stories
                             </Link>{" "}
-                            /{" "}
-                            <span className="text-gray-700">{story.title}</span>
+                            / <span className="text-gray-700">{story.title}</span>
                         </h2>
                     </nav>
                 </div>
@@ -68,9 +64,7 @@ export default function View({ story: initialStory, auth }) {
                         <div>
                             <div className="flex items-center text-gray-700 text-sm mb-2">
                                 <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-                                <span className="font-medium">
-                                    {story.owner}
-                                </span>
+                                <span className="font-medium">{story.owner}</span>
                             </div>
 
                             <ProgressBar
@@ -79,9 +73,20 @@ export default function View({ story: initialStory, auth }) {
                             />
                         </div>
 
-                        {/* Actions */}
-                        {authUser && authUser.role === "admin" && (
-                            <StoryActions story={story} />
+                        {/* Admin Actions */}
+                        {authUser?.role === "admin" && (
+                            <StoryActions
+                                story={story}
+                                onStatusUpdate={(newStatus) =>
+                                    setStory((prev) => ({
+                                        ...prev,
+                                        status: newStatus,
+                                        is_pending: newStatus === "pending",
+                                        is_approved: newStatus === "approved",
+                                        is_rejected: newStatus === "rejected",
+                                    }))
+                                }
+                            />
                         )}
 
                         {/* Story Description */}

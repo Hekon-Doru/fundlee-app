@@ -20,7 +20,6 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-
     // Create new story
     Route::get('/story/create', [StoryController::class, 'create'])->name('story.create');
     Route::post('/story', [StoryController::class, 'store'])->name('story.store');
@@ -30,18 +29,15 @@ Route::middleware('auth')->group(function () {
     Route::put('/story/{id}', [StoryController::class, 'update'])->name('story.update');
     Route::delete('/story/{id}', [StoryController::class, 'destroy'])->name('story.destroy');
 
-    // Approve // Deny // Toggle
-    // routes/web.php
-    Route::put('/story/{story}/update-status', [StoryController::class, 'updateStatus'])->name('story.updateStatus');
-
-
-    Route::put('/story/{id}/toggle', [StoryController::class, 'toggle'])->name('story.toggle');
-
+    // Approve / Reject
+    Route::put('/story/{story}/update-status', [StoryController::class, 'updateStatus'])
+        ->name('story.updateStatus');
 });
 
-// Public / non-auth routes
+// Public routes
 Route::get('/stories', [StoryController::class, 'list'])->name('story.list');
 Route::get('/story/{id}', [StoryController::class, 'view'])->name('story.view');
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
