@@ -19,27 +19,29 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-
-
-Route::get('/stories', [StoryController::class, 'list'])->name('story.list');
-Route::get('/story/{id}', [StoryController::class, 'view'])->name('story.view');
-
 Route::middleware('auth')->group(function () {
 
+    // Create new story
     Route::get('/story/create', [StoryController::class, 'create'])->name('story.create');
-    Route::post('/story', [StoryController::class, 'store'])->middleware('auth');
-    Route::get('/story', [StoryController::class, 'store'])->name('story.store');
+    Route::post('/story', [StoryController::class, 'store'])->name('story.store');
+
+    // Edit / Update / Delete
     Route::get('/story/{id}/edit', [StoryController::class, 'edit'])->name('story.edit');
     Route::put('/story/{id}', [StoryController::class, 'update'])->name('story.update');
     Route::delete('/story/{id}', [StoryController::class, 'destroy'])->name('story.destroy');
-    
-    Route::middleware('auth')->put('/story/{id}/toggle', [StoryController::class, 'toggle'])->name('story.toggle');
+
+    // Approve // Deny // Toggle
+    // routes/web.php
+    Route::put('/story/{story}/update-status', [StoryController::class, 'updateStatus'])->name('story.updateStatus');
 
 
-
-
+    Route::put('/story/{id}/toggle', [StoryController::class, 'toggle'])->name('story.toggle');
 
 });
+
+// Public / non-auth routes
+Route::get('/stories', [StoryController::class, 'list'])->name('story.list');
+Route::get('/story/{id}', [StoryController::class, 'view'])->name('story.view');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

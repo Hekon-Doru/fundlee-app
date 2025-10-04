@@ -15,6 +15,34 @@ class StoryController extends Controller
         return Inertia::render('Story/Create');
     }
 
+    public function updateStatus(Request $request, Story $story)
+    {
+        $user = $request->user();
+
+        // Only admin can update status
+        if (!$user || $user->role !== 'admin') {
+            abort(403, 'Unauthorized');
+        }
+
+        $request->validate([
+            'status' => 'required|in:pending,approved,rejected',
+        ]);
+
+        $story->status = $request->status;
+        $story->save();
+
+        // Return the updated story so frontend can re-render
+        $story->owner = $story->user ? $story->user->name : 'Anonymous';
+        $story->is_owner = $user->id === $story->user_id;
+        $story->is_pending = $story->status === 'pending';
+        $story->is_approved = $story->status === 'approved';
+        $story->is_rejected = $story->status === 'rejected';
+
+        return redirect()->back()->with('success', 'Story status updated!');
+    }
+
+
+
     public function store(Request $request)
     {
         $request->validate([
@@ -32,7 +60,7 @@ class StoryController extends Controller
 
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('public/story_images');
-            $story->update(['image' => $path]);
+            $story->update(['image_path' => $path]);
         }
 
         return redirect()->route('story.list')->with('success', 'Story created!');
@@ -60,7 +88,15 @@ class StoryController extends Controller
 
     public function view($id)
     {
-        $story = Story::with('donations')->findOrFail($id);
+        $story = Story::with(['donations', 'user'])->findOrFail($id);
+
+        // Add owner property
+        $story = Story::with(['donations', 'user'])->findOrFail($id);
+        $story->owner = $story->user ? $story->user->name : 'Anonymous';
+        $story->user_id = $story->user ? $story->user->id : null;
+        $story->is_pending = $story->status === 'pending';
+        $story->is_approved = $story->status === 'approved';
+        $story->is_rejected = $story->status === 'rejected';
 
         return Inertia::render('Story/View', [
             'story' => $story,
@@ -73,14 +109,18 @@ class StoryController extends Controller
 
         if ($user && $user->role === 'admin') {
             // Admin sees all stories
-            $stories = Story::all();
+            $stories = Story::with('user')->get();
         } else {
-            // Regular users see only approved stories
-            $stories = Story::approved()->get();
+            // Regular users see approved stories + their own stories regardless of status
+            $stories = Story::with('user')
+                ->where('status', 'approved')
+                ->orWhere('user_id', $user->id)
+                ->get();
         }
 
-        // Attach is_owner flag to each story
+        // Map stories with helper properties
         $stories = $stories->map(function ($story) use ($user) {
+            $story->owner = $story->user ? $story->user->name : 'Anonymous';
             $story->is_owner = $user && $story->user_id === $user->id;
             $story->is_pending = $story->status === 'pending';
             $story->is_approved = $story->status === 'approved';
@@ -94,4 +134,5 @@ class StoryController extends Controller
             'is_admin' => $user ? $user->role === 'admin' : false,
         ]);
     }
+
 }

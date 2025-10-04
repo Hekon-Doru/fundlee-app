@@ -1,137 +1,101 @@
+import { Link } from "@inertiajs/react";
+import { useState } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import ProgressBar from "./Partials/ProgresBar";
-import Contributors from "./Partials/Contributors";
 import GuestLayout from "@/Layouts/GuestLayout";
+import ProgressBar from "./Partials/ProgresBar";
+import StatusBar from "./Partials/StatusBar";
+import Contributors from "./Partials/Contributors";
+import StoryActions from "./Partials/StoryActions";
 
-export default function View({ story, auth }) {
+export default function View({ story: initialStory, auth }) {
+    const Layout = auth.user ? AuthenticatedLayout : GuestLayout;
+    const authUser = auth.user;
+    const isAdmin = authUser?.role === "admin";
+
+    // Use state so we can update the story status dynamically
+    const [story, setStory] = useState(initialStory);
+
     if (!story) {
         return (
-            <AuthenticatedLayout user={{ name: "User" }}>
+            <Layout user={authUser ? { name: authUser.name } : null}>
                 <div className="text-center py-20 text-red-500">
-                    Story not found.
+                    Ooops, story not found, but you can create one.
                 </div>
-            </AuthenticatedLayout>
+            </Layout>
         );
     }
 
     return (
-        <>
-            {auth.user ? (
-                <AuthenticatedLayout
-                    user={{ name: "User" }}
-                    header={
+        <Layout
+            user={authUser ? { name: authUser.name } : null}
+            header={
+                <div className="flex flex-col">
+                    <nav className="text-sm text-gray-500">
                         <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                            Your story
+                            <Link
+                                href={route("story.list")}
+                                className="hover:underline text-blue-600"
+                            >
+                                All Stories
+                            </Link>{" "}
+                            /{" "}
+                            <span className="text-gray-700">{story.title}</span>
                         </h2>
-                    }
-                >
-                    <div className="py-12 bg-white rounded-lg shadow max-w-7xl mx-auto mt-10">
-                        <div className="mx-auto lg:px-8">
-                            <div className="flex items-center gap-4 mb-4">
-                                <div className="w-9/12 h-96 bg-gray-300 rounded-lg flex items-center justify-center gap-4 mb-4">
-                                    {story.image ? (
-                                        <img
-                                            src={story.image}
-                                            alt="Story"
-                                            className="h-full object-cover rounded-lg"
-                                        />
-                                    ) : (
-                                        <span className="text-gray-500 text-sm">
-                                            Image
-                                        </span>
-                                    )}
-                                </div>
-                                <div className="w-6/12 h-96 mt-4">
-                                    <ProgressBar
-                                        collected_amount={
-                                            story.collected_amount
-                                        }
-                                        target_amount={story.target_amount}
-                                    />
-                                    {auth.user.role === "admin" ? (
-                                        <>
-                                            
-                                                <div className="w-full mt-6 flex items-center gap-4">
-                                                    <button className="w-4/12 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
-                                                        Deny Story
-                                                    </button>
-                                                    <button className="w-4/12 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
-                                                        Approve Story
-                                                    </button>
-                                                </div>
-                                        </>
-                                    ) : (
-                                        <div className="w-full mt-6 flex items-center gap-4">
-                                            <input
-                                                type="number"
-                                                placeholder="Enter amount"
-                                                className="w-8/12 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-                                            />
-                                            <button className="w-4/12 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
-                                                Donate Now
-                                            </button>{" "}
-                                        </div>
-                                    )}
+                    </nav>
+                </div>
+            }
+        >
+            <div className="py-8 bg-white rounded-lg shadow max-w-7xl mx-auto mt-10">
+                <div className="lg:px-8 mx-auto flex flex-col lg:flex-row gap-6">
+                    {/* Story Image */}
+                    <div className="w-full lg:w-7/12 h-64 lg:h-[500px] bg-gray-300 rounded-lg flex items-center justify-center overflow-hidden relative">
+                        <StatusBar story={story} authUser={authUser} />
 
-                                    <h3 className="mt-10 text-lg font-semibold mb-2">
-                                        {story.title}
-                                    </h3>
-                                    <p className="mt-4 text-gray-600">
-                                        {story.description}
-                                    </p>
-                                </div>
+                        {story.image ? (
+                            <img
+                                src={story.image}
+                                alt={story.title}
+                                className="w-full h-full object-cover"
+                            />
+                        ) : (
+                            <span className="text-gray-500 text-sm">Image</span>
+                        )}
+                    </div>
+
+                    {/* Story Info */}
+                    <div className="w-full lg:w-5/12 flex flex-col gap-4">
+                        {/* Owner & Progress */}
+                        <div>
+                            <div className="flex items-center text-gray-700 text-sm mb-2">
+                                <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                                <span className="font-medium">
+                                    {story.owner}
+                                </span>
                             </div>
+
+                            <ProgressBar
+                                collected_amount={story.collected_amount}
+                                target_amount={story.target_amount}
+                            />
+                        </div>
+
+                        {/* Actions */}
+                        {authUser && authUser.role === "admin" && (
+                            <StoryActions story={story} />
+                        )}
+
+                        {/* Story Description */}
+                        <div>
+                            <h3 className="mt-6 text-lg font-semibold mb-2">
+                                {story.title}
+                            </h3>
+                            <p className="text-gray-600">{story.description}</p>
                         </div>
                     </div>
-                    <Contributors story={story} />
-                </AuthenticatedLayout>
-            ) : (
-                <GuestLayout>
-                    <div className="py-12 bg-white rounded-lg shadow max-w-7xl mx-auto mt-10">
-                        <div className="mx-auto lg:px-8">
-                            <div className="flex items-center gap-4 mb-4">
-                                <div className="w-9/12 h-96 bg-gray-300 rounded-lg flex items-center justify-center gap-4 mb-4">
-                                    {story.image ? (
-                                        <img
-                                            src={story.image}
-                                            alt="Story"
-                                            className="h-full object-cover rounded-lg"
-                                        />
-                                    ) : (
-                                        <span className="text-gray-500 text-sm">
-                                            Image
-                                        </span>
-                                    )}
-                                </div>
-                                <div className="w-6/12 h-96 mt-4">
-                                    <ProgressBar
-                                        collected_amount={
-                                            story.collected_amount
-                                        }
-                                        target_amount={story.target_amount}
-                                    />
-                                    <div className="w-full mt-6 flex items-center gap-4">
-                                        <input
-                                            type="number"
-                                            placeholder="Enter amount"
-                                            className="w-8/12 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-                                        />
-                                        <button className="w-4/12 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
-                                            Donate Now
-                                        </button>
-                                    </div>
-                                    <h3 className="mt-10 text-lg font-semibold mb-2">
-                                        {story.title}
-                                    </h3>
-                                    <p className="mt-4 text-gray-600">
-                                        {story.description}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </GuestLayout>
-            )}
-        </>
+                </div>
+            </div>
+
+            <Contributors story={story} />
+        </Layout>
     );
 }
