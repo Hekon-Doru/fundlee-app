@@ -24,9 +24,6 @@ export default function View({ story: initialStory, auth }) {
         );
     }
 
-    // Use image_path or fallback
-    const imageSrc = story.image_path || "/images/placeholder.png";
-
     return (
         <Layout
             user={authUser ? { name: authUser.name } : null}
@@ -51,11 +48,17 @@ export default function View({ story: initialStory, auth }) {
                     {/* Story Image */}
                     <div className="w-full lg:w-7/12 h-64 lg:h-[500px] bg-gray-300 rounded-lg flex items-center justify-center overflow-hidden relative">
                         <StatusBar story={story} authUser={authUser} />
-                        <img
-                            src={imageSrc}
-                            alt={story.title}
-                            className="w-full h-full object-cover"
-                        />
+                        {story.image_path ? (
+                            <img
+                                src={story.image_path}
+                                alt={story.title}
+                                className="w-full h-full object-cover"
+                            />
+                        ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-500 font-medium">
+                                No Image
+                            </div>
+                        )}
                     </div>
 
                     {/* Story Info */}

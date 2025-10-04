@@ -23,7 +23,7 @@ export default function Donate({ story, authUser, onClose, onDonateSuccess }) {
     const submitDonation = (e) => {
         e.preventDefault();
 
-        if (!amount || parseFloat(amount) <= 0) return;
+        if (!amount || parseFloat(amount).toFixed(2) <= 0) return;
 
         router.post(
             route("donations.store", story.id),

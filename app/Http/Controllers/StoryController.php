@@ -117,41 +117,47 @@ class StoryController extends Controller
     }
 
     public function list()
-    {
-        $user = Auth::user();
+{
+    $user = Auth::user();
 
+    if ($user && $user->role === 'admin') {
+        // Admin sees all stories (approved + pending + rejected)
+        $stories = Story::with('user')->get();
+    } else {
+        // Authenticated non-admin or guest
         $stories = Story::with('user')
             ->when($user, function ($query) use ($user) {
-                // Authenticated user: approved stories + own stories
+                // Logged-in user: approved stories + their own
                 $query->where('status', 'approved')
-                    ->orWhere('user_id', $user->id);
+                      ->orWhere('user_id', $user->id);
             }, function ($query) {
                 // Guest: only approved stories
                 $query->where('status', 'approved');
             })
             ->get();
-
-        // Map stories with helper properties
-        $stories = $stories->map(function ($story) use ($user) {
-            $story->owner = $story->user ? $story->user->name : 'Anonymous';
-            $story->is_owner = $user && $story->user_id === $user->id;
-            $story->is_pending = $story->status === 'pending';
-            $story->is_approved = $story->status === 'approved';
-            $story->is_rejected = $story->status === 'rejected';
-
-            // Image URL for frontend
-            $story->image_url = $story->image_path ? asset($story->image_path) : null;
-
-            return $story;
-        });
-
-        return Inertia::render('Story/List', [
-            'stories' => $stories,
-            'user_id' => $user ? $user->id : null,
-            'is_admin' => $user ? $user->role === 'admin' : false,
-            'authUser' => $user, // pass user for donation modals
-        ]);
     }
+
+    // Map stories with helper properties
+    $stories = $stories->map(function ($story) use ($user) {
+        $story->owner = $story->user ? $story->user->name : 'Anonymous';
+        $story->is_owner = $user && $story->user_id === $user->id;
+        $story->is_pending = $story->status === 'pending';
+        $story->is_approved = $story->status === 'approved';
+        $story->is_rejected = $story->status === 'rejected';
+
+        // Image URL for frontend
+        $story->image_url = $story->image_path ? asset($story->image_path) : null;
+
+        return $story;
+    });
+
+    return Inertia::render('Story/List', [
+        'stories' => $stories,
+        'user_id' => $user ? $user->id : null,
+        'is_admin' => $user ? $user->role === 'admin' : false,
+        'authUser' => $user,
+    ]);
+}
 
     public function createDonation(Story $story)
     {
@@ -184,5 +190,6 @@ class StoryController extends Controller
         return redirect()->route('story.view', $story->id)
             ->with('success', 'Donation successful!');
     }
+    
 
 }
