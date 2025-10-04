@@ -46,7 +46,6 @@ export default function View({ story: initialStory, auth }) {
                     {/* Story Image */}
                     <div className="w-full lg:w-7/12 h-64 lg:h-[500px] bg-gray-300 rounded-lg flex items-center justify-center overflow-hidden relative">
                         <StatusBar story={story} authUser={authUser} />
-
                         {story.image ? (
                             <img
                                 src={story.image}
@@ -73,19 +72,12 @@ export default function View({ story: initialStory, auth }) {
                             />
                         </div>
 
-                        {/* Admin Actions */}
-                        {authUser?.role === "admin" && (
+                        {/* Story Actions (Admin, Owner, Donate/Delete) */}
+                        {authUser && (
                             <StoryActions
                                 story={story}
-                                onStatusUpdate={(newStatus) =>
-                                    setStory((prev) => ({
-                                        ...prev,
-                                        status: newStatus,
-                                        is_pending: newStatus === "pending",
-                                        is_approved: newStatus === "approved",
-                                        is_rejected: newStatus === "rejected",
-                                    }))
-                                }
+                                setStory={setStory}
+                                authUser={authUser}
                             />
                         )}
 

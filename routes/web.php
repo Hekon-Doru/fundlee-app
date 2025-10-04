@@ -19,24 +19,34 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+// ------------------- Authenticated Routes -------------------
 Route::middleware('auth')->group(function () {
-    // Create new story
+
+    // --- Story CRUD ---
     Route::get('/story/create', [StoryController::class, 'create'])->name('story.create');
     Route::post('/story', [StoryController::class, 'store'])->name('story.store');
 
-    // Edit / Update / Delete
     Route::get('/story/{id}/edit', [StoryController::class, 'edit'])->name('story.edit');
     Route::put('/story/{id}', [StoryController::class, 'update'])->name('story.update');
     Route::delete('/story/{id}', [StoryController::class, 'destroy'])->name('story.destroy');
 
-    // Approve / Reject
+    // --- Story Status (Admin only) ---
     Route::put('/story/{story}/update-status', [StoryController::class, 'updateStatus'])
         ->name('story.updateStatus');
+
+    // Optional toggle (if used elsewhere)
+    Route::put('/story/{id}/toggle', [StoryController::class, 'toggle'])->name('story.toggle');
+
 });
 
-// Public routes
+// ------------------- Public Routes -------------------
 Route::get('/stories', [StoryController::class, 'list'])->name('story.list');
 Route::get('/story/{id}', [StoryController::class, 'view'])->name('story.view');
+// --- Donations (example route for Donate button) ---
+Route::get('/story/{story}/donate', [StoryController::class, 'createDonation'])
+    ->name('donations.create');
+Route::post('/story/{story}/donate', [StoryController::class, 'storeDonation'])
+    ->name('donations.store');
 
 
 Route::middleware('auth')->group(function () {

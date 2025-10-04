@@ -16,17 +16,17 @@ class StoryController extends Controller
     }
 
     public function updateStatus(Request $request, Story $story)
-{
-    $request->validate([
-        'status' => 'required|in:pending,approved,rejected',
-    ]);
+    {
+        $request->validate([
+            'status' => 'required|in:pending,approved,rejected',
+        ]);
 
-    $story->update(['status' => $request->status]);
+        $story->update(['status' => $request->status]);
 
-    /* dd($request->all()); */
+        /* dd($request->all()); */
 
-    return back()->with('success', 'Story status updated.');
-}
+        return back()->with('success', 'Story status updated.');
+    }
 
 
 
@@ -121,6 +121,38 @@ class StoryController extends Controller
             'user_id' => $user ? $user->id : null,
             'is_admin' => $user ? $user->role === 'admin' : false,
         ]);
+    }
+
+    public function createDonation(Story $story)
+    {
+        return Inertia::render('Story/Partials/Donate', [
+            'story' => $story,
+            'authUser' => auth()->user(),
+        ]);
+    }
+
+    // Store donation (auth or guest)
+    public function storeDonation(Request $request, Story $story)
+    {
+        $request->validate([
+            'donor_name' => 'required|string|max:255',
+            'amount' => 'required|numeric|min:1',
+            'anonymous' => 'nullable|boolean',
+        ]);
+
+        $donorName = $request->anonymous ? 'Anonymous' : $request->donor_name;
+
+        $story->donations()->create([
+            'user_id' => auth()->id(),
+            'donor_name' => $donorName,
+            'amount' => $request->amount,
+        ]);
+
+        // Update story collected amount
+        $story->increment('collected_amount', $request->amount);
+
+        return redirect()->route('story.view', $story->id)
+            ->with('success', 'Donation successful!');
     }
 
 }
