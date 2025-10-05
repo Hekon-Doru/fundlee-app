@@ -106,15 +106,15 @@ export default function View({ story: initialStory, auth }) {
                     story={story}
                     authUser={authUser}
                     onClose={() => setShowDonate(false)}
-                    onDonateSuccess={(donation) =>
+                    onDonateSuccess={(newDonation) =>
                         setStory((prev) => ({
                             ...prev,
                             collected_amount:
                                 Number(prev.collected_amount) +
-                                Number(donation.amount),
+                                Number(newDonation.amount),
                             contributors: [
-                                ...(prev.contributors || []),
-                                donation,
+                                ...(prev.contributors || prev.donations || []),
+                                newDonation, // Append new donor, don’t replace
                             ],
                         }))
                     }
