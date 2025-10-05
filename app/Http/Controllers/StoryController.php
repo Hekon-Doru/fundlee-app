@@ -33,6 +33,7 @@ class StoryController extends Controller
 
     public function store(Request $request)
     {
+
         $request->validate([
             'title' => 'required|string|max:255',
             'target_amount' => 'required|numeric|min:1',
@@ -87,38 +88,46 @@ class StoryController extends Controller
     // Update story
     public function update(Request $request, $id)
     {
-        $story = Story::findOrFail($id);
 
-        // Only owner can update
-        if ($story->user_id !== auth()->id()) {
-            abort(403, 'Unauthorized');
-        }
-
-        $validated = $request->validate([
+       /*  dd($request->image_path); */
+        // Validate request data
+        $request->validate([
             'title' => 'required|string|max:255',
             'target_amount' => 'required|numeric|min:1',
             'description' => 'required|string',
             'image' => 'nullable|image|max:2048',
         ]);
 
+        // Find the story belonging to the current user
+        $story = $request->user()->stories()->findOrFail($id);
+
+        // Update text fields
+        $story->title = $request->title;
+        $story->target_amount = $request->target_amount;
+        $story->description = $request->description;
+
+        // Handle image upload (optional)
         if ($request->hasFile('image')) {
-            // Delete old image if exists
+            // Delete old image if it exists
             if ($story->image_path && Storage::disk('public')->exists(str_replace('/storage/', '', $story->image_path))) {
                 Storage::disk('public')->delete(str_replace('/storage/', '', $story->image_path));
             }
 
-            // Store new image
+            // Store new image in public/storage/story_images
             $path = $request->file('image')->store('story_images', 'public');
-            $validated['image_path'] = '/storage/' . $path;
+
+            // Update story image path
+            $story->image_path = '/storage/' . $path;
         }
 
-        $story->update($validated);
+        // Save changes
+        $story->save();
 
-        return redirect()->route('story.view', $story->id)
-            ->with('success', 'Story updated successfully!');
+        // Redirect back with success message
+        return redirect()
+            ->route('story.view', $story->id)
+            ->with('success', 'Story updated successfully.');
     }
-
-
     // Delete story
     public function destroy($id)
     {
