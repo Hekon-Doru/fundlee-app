@@ -2,28 +2,27 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import React from "react";
 
 function ProgressBar({ collected_amount, target_amount }) {
-    return (
-        <>
-            <div className="mt-auto">
-                <div className="flex justify-between mb-1 text-sm">
-                    <span>Collected</span>
-                    <span>
-                        €{collected_amount} / €{target_amount}
-                    </span>
-                </div>
+    const percentage = Math.round((collected_amount / target_amount) * 100);
 
-                <div className="bg-gray-200 rounded-full h-4">
-                    <div
-                        className="bg-green-600 green-700 h-4 rounded-full max-w-full"
-                        style={{
-                            width: `${Math.round(
-                                (collected_amount / target_amount) * 100
-                            )}%`,
-                        }}    
-                    ></div>
-                </div>
+    return (
+        <div className="mt-auto">
+            {/* Labels */}
+            <div className="flex justify-between mb-2 text-sm font-medium text-gray-700">
+                <span>Collected</span>
+                <span>
+                    €{collected_amount} / €{target_amount}
+                </span>
             </div>
-        </>
+
+            {/* Progress Bar Container */}
+            <div className="w-full bg-gray-100 rounded-full h-4 overflow-hidden shadow-inner">
+                {/* Progress Fill */}
+                <div
+                    className="bg-green-600 h-4 rounded-full transition-all duration-500 ease-out"
+                    style={{ width: `${percentage}%` }}
+                ></div>
+            </div>
+        </div>
     );
 }
 
