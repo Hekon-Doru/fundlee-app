@@ -26,7 +26,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/story/create', [StoryController::class, 'create'])->name('story.create');
     Route::post('/story', [StoryController::class, 'store'])->name('story.store');
 
-    Route::get('/story/{id}/edit', [StoryController::class, 'edit'])->name('story.edit');
+    Route::get('/story/edit/{id}', [StoryController::class, 'edit'])->name('story.edit');
     Route::put('/story/{id}', [StoryController::class, 'update'])->name('story.update');
     Route::delete('/story/{id}', [StoryController::class, 'destroy'])->name('story.destroy');
 

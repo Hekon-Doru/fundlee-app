@@ -4,10 +4,12 @@ export function OwnerActions({ story }) {
     const deleteStory = () => {
         if (!confirm("Are you sure you want to delete this story?")) return;
 
-        router.delete(route("story.destroy", story.id), {
+        router.visit(route("story.destroy", story.id), {
+            method: "delete",
             preserveScroll: true,
             onSuccess: () => {
-                router.reload({ only: ['stories'] }); // Refresh stories list
+                // Redirect to story list after deletion
+                router.visit(route("story.list"));
             },
         });
     };

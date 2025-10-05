@@ -2,7 +2,12 @@ import { AdminActions } from "./StoryActions/AdminActions";
 import { UserActions } from "./StoryActions/UserActions";
 import { OwnerActions } from "./StoryActions/OwnerActions";
 
-export default function StoryActions({ story, authUser, setShowDonate, updateStatus }) {
+export default function StoryActions({
+    story,
+    authUser,
+    setShowDonate,
+    updateStatus,
+}) {
     if (!story) return null;
 
     const isAdmin = authUser?.role === "admin";
@@ -11,7 +16,9 @@ export default function StoryActions({ story, authUser, setShowDonate, updateSta
     switch (story.status) {
         case "pending":
             if (isAdmin) {
-                return <AdminActions story={story} updateStatus={updateStatus} />;
+                return (
+                    <AdminActions story={story} updateStatus={updateStatus} />
+                );
             }
             if (isOwner) {
                 return <OwnerActions story={story} />; // Owner can Edit/Delete
@@ -19,9 +26,7 @@ export default function StoryActions({ story, authUser, setShowDonate, updateSta
             return null;
 
         case "approved":
-            if (isOwner) {
-                return <OwnerActions story={story} />; // Owner can Edit/Delete
-            }
+           
             return (
                 <UserActions
                     story={story}
@@ -33,7 +38,9 @@ export default function StoryActions({ story, authUser, setShowDonate, updateSta
 
         case "rejected":
             if (isAdmin) {
-                return <AdminActions story={story} updateStatus={updateStatus} />;
+                return (
+                    <AdminActions story={story} updateStatus={updateStatus} />
+                );
             }
             if (isOwner) {
                 return <OwnerActions story={story} />; // Owner can Edit/Delete
