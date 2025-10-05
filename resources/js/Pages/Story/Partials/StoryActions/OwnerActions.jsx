@@ -1,21 +1,27 @@
+// resources/js/Pages/Story/StoryActions/OwnerActions.jsx
 import { router } from "@inertiajs/react";
 
 export function OwnerActions({ story }) {
+    // Edit button
+    const editStory = () => {
+        router.visit(route("story.edit", story.id));
+    };
+
+    // Delete button
     const deleteStory = () => {
         if (!confirm("Are you sure you want to delete this story?")) return;
 
-        router.visit(route("story.destroy", story.id), {
-            method: "delete",
+        router.delete(route("story.destroy", story.id), {
             preserveScroll: true,
             onSuccess: () => {
                 // Redirect to story list after deletion
                 router.visit(route("story.list"));
             },
+            onError: (errors) => {
+                console.log("Delete errors:", errors);
+                alert("Failed to delete the story.");
+            },
         });
-    };
-
-    const editStory = () => {
-        router.visit(route("story.edit", story.id));
     };
 
     return (

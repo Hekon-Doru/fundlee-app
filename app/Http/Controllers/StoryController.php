@@ -31,22 +31,8 @@ class StoryController extends Controller
 
 
 
-
     public function store(Request $request)
     {
-        /* $file = $request->file('image');
-        if ($file) {
-            dd([
-                'originalName' => $file->getClientOriginalName(),
-                'mimeType' => $file->getClientMimeType(),
-                'size' => $file->getSize(),
-                'isValid' => $file->isValid(),
-            ]);
-        } else {
-            dd('No file uploaded');
-        }
- */
-
         $request->validate([
             'title' => 'required|string|max:255',
             'target_amount' => 'required|numeric|min:1',
@@ -61,16 +47,13 @@ class StoryController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            // Store in storage/app/public/story_images
+
             $path = $request->file('image')->store('story_images', 'public');
 
-            // Save only the relative path in DB
             $story->update([
-                'image_path' => '/storage/' . $path, // This generates: /storage/story_images/filename.jpg
+                'image_path' => '/storage/' . $path,
             ]);
         }
-
-
 
         return redirect()->route('story.list')->with('success', 'Story created!');
     }
@@ -79,31 +62,36 @@ class StoryController extends Controller
     {
         return Inertia::render('Story/Show', ['id' => $id]);
     }
-
-    // Edit method
+    // Show edit form
     public function edit($id)
     {
         $story = Story::findOrFail($id);
 
-        // Only owner or admin can edit
-        if (auth()->id() !== $story->user_id && auth()->user()->role !== 'admin') {
-            abort(403);
+        // Only the owner can edit
+        if ($story->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized');
         }
 
         return Inertia::render('Story/Edit', [
-            'story' => $story,
+            'story' => [
+                'id' => $story->id,
+                'title' => $story->title,
+                'target_amount' => $story->target_amount,
+                'description' => $story->description,
+                'image_path' => $story->image_path ? asset($story->image_path) : null,
+            ],
             'auth' => ['user' => auth()->user()],
         ]);
     }
 
-    // Update method
+    // Update story
     public function update(Request $request, $id)
     {
         $story = Story::findOrFail($id);
 
-        // Only owner or admin can update
-        if (auth()->id() !== $story->user_id && auth()->user()->role !== 'admin') {
-            abort(403);
+        // Only owner can update
+        if ($story->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized');
         }
 
         $validated = $request->validate([
@@ -114,6 +102,12 @@ class StoryController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($story->image_path && Storage::disk('public')->exists(str_replace('/storage/', '', $story->image_path))) {
+                Storage::disk('public')->delete(str_replace('/storage/', '', $story->image_path));
+            }
+
+            // Store new image
             $path = $request->file('image')->store('story_images', 'public');
             $validated['image_path'] = '/storage/' . $path;
         }
@@ -121,22 +115,29 @@ class StoryController extends Controller
         $story->update($validated);
 
         return redirect()->route('story.view', $story->id)
-            ->with('success', 'Story updated successfully.');
+            ->with('success', 'Story updated successfully!');
     }
 
-    // Destroy method
+
+    // Delete story
     public function destroy($id)
     {
         $story = Story::findOrFail($id);
 
-        // Only owner or admin can delete
-        if (auth()->id() !== $story->user_id && auth()->user()->role !== 'admin') {
-            abort(403);
+        // Only the owner can delete
+        if ($story->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized');
+        }
+
+        // Delete image if exists
+        if ($story->image_path && Storage::disk('public')->exists(str_replace('/storage/', '', $story->image_path))) {
+            Storage::disk('public')->delete(str_replace('/storage/', '', $story->image_path));
         }
 
         $story->delete();
 
-        return redirect()->route('story.list')->with('success', 'Story deleted successfully.');
+        return redirect()->route('story.list')
+            ->with('success', 'Story deleted successfully.');
     }
     public function view($id)
     {
