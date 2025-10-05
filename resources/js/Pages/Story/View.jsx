@@ -84,6 +84,7 @@ export default function View({ story: initialStory, auth }) {
                             story={story}
                             authUser={authUser}
                             setShowDonate={setShowDonate}
+                            updateStatus={(newStatus) => setStory((prev) => ({ ...prev, status: newStatus }))}
                         />
 
                         {/* Story Description */}
