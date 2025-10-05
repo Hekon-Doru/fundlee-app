@@ -1,4 +1,3 @@
-// resources/js/Pages/Stories/Partials/Donate.jsx
 import { useState, useEffect } from "react";
 import { router } from "@inertiajs/react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -9,7 +8,7 @@ export default function Donate({ story, authUser, onClose, onDonateSuccess }) {
     const [anonymous, setAnonymous] = useState(false);
     const [success, setSuccess] = useState(false);
 
-    // Effect: update name to "Anonymous" if anonymous is checked
+    // Update name if anonymous is checked
     useEffect(() => {
         if (anonymous) {
             setDonorName("Anonymous");
@@ -23,7 +22,7 @@ export default function Donate({ story, authUser, onClose, onDonateSuccess }) {
     const submitDonation = (e) => {
         e.preventDefault();
 
-        if (!amount || parseFloat(amount).toFixed(2) <= 0) return;
+        if (!amount || parseFloat(amount) <= 0) return;
 
         router.post(
             route("donations.store", story.id),
@@ -33,11 +32,17 @@ export default function Donate({ story, authUser, onClose, onDonateSuccess }) {
             },
             {
                 preserveScroll: true,
-                onSuccess: () => {
-                    setSuccess(true);
-                    onDonateSuccess(parseFloat(amount));
+                onSuccess: (page) => {
+                    // Get new donation object returned by server
+                    const newDonation = page.props.donation || {
+                        id: Date.now(), // fallback if server does not return ID
+                        donor_name: donorName,
+                        amount: parseFloat(amount),
+                    };
 
-                    // Close modal after short delay
+                    setSuccess(true);
+                    onDonateSuccess(newDonation);
+
                     setTimeout(() => {
                         setSuccess(false);
                         onClose();
@@ -62,7 +67,7 @@ export default function Donate({ story, authUser, onClose, onDonateSuccess }) {
                     animate={{
                         scale: 1,
                         opacity: 1,
-                        backgroundColor: success ? "#16a34a" : "#ffffff", // Tailwind green-500
+                        backgroundColor: success ? "#16a34a" : "#ffffff",
                     }}
                     exit={{ scale: 0.8, opacity: 0 }}
                     transition={{ duration: 0.3 }}
@@ -73,30 +78,22 @@ export default function Donate({ story, authUser, onClose, onDonateSuccess }) {
                             <h3 className="text-lg font-semibold mb-4">
                                 Donate to "{story.title}"
                             </h3>
-
-                            <form
-                                onSubmit={submitDonation}
-                                className="flex flex-col gap-3"
-                            >
+                            <form onSubmit={submitDonation} className="flex flex-col gap-3">
                                 <div className="flex flex-col gap-2">
                                     <input
                                         type="text"
                                         value={donorName}
-                                        onChange={(e) =>
-                                            setDonorName(e.target.value)
-                                        }
+                                        onChange={(e) => setDonorName(e.target.value)}
                                         placeholder="Your name"
                                         className="px-3 py-2 border rounded"
                                         required
-                                        disabled={anonymous || authUser} // disable if anonymous or auth user
+                                        disabled={anonymous || !!authUser}
                                     />
                                     <label className="flex items-center gap-1">
                                         <input
                                             type="checkbox"
                                             checked={anonymous}
-                                            onChange={(e) =>
-                                                setAnonymous(e.target.checked)
-                                            }
+                                            onChange={(e) => setAnonymous(e.target.checked)}
                                         />
                                         Donate anonymously
                                     </label>

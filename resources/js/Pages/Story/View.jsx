@@ -12,6 +12,7 @@ export default function View({ story: initialStory, auth }) {
     const Layout = auth.user ? AuthenticatedLayout : GuestLayout;
     const authUser = auth.user;
     const [story, setStory] = useState(initialStory);
+
     const [showDonate, setShowDonate] = useState(false);
 
     if (!story) {
@@ -37,7 +38,8 @@ export default function View({ story: initialStory, auth }) {
                             >
                                 All Stories
                             </Link>{" "}
-                            / <span className="text-gray-700">{story.title}</span>
+                            /{" "}
+                            <span className="text-gray-700">{story.title}</span>
                         </h2>
                     </nav>
                 </div>
@@ -66,7 +68,9 @@ export default function View({ story: initialStory, auth }) {
                         <div>
                             <div className="flex items-center text-gray-700 text-sm mb-2">
                                 <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-                                <span className="font-medium">{story.owner}</span>
+                                <span className="font-medium">
+                                    {story.owner}
+                                </span>
                             </div>
 
                             <ProgressBar
@@ -84,7 +88,9 @@ export default function View({ story: initialStory, auth }) {
 
                         {/* Story Description */}
                         <div>
-                            <h3 className="mt-6 text-lg font-semibold mb-2">{story.title}</h3>
+                            <h3 className="mt-6 text-lg font-semibold mb-2">
+                                {story.title}
+                            </h3>
                             <p className="text-gray-600">{story.description}</p>
                         </div>
                     </div>
@@ -100,10 +106,16 @@ export default function View({ story: initialStory, auth }) {
                     story={story}
                     authUser={authUser}
                     onClose={() => setShowDonate(false)}
-                    onDonateSuccess={(amount) =>
-                        setStory(prev => ({
+                    onDonateSuccess={(donation) =>
+                        setStory((prev) => ({
                             ...prev,
-                            collected_amount: Number(prev.collected_amount) + Number(amount),
+                            collected_amount:
+                                Number(prev.collected_amount) +
+                                Number(donation.amount),
+                            contributors: [
+                                ...(prev.contributors || []),
+                                donation,
+                            ],
                         }))
                     }
                 />
