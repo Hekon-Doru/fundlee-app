@@ -53,7 +53,7 @@ export default function List({ stories, auth }) {
                             {isAdmin
                                 ? toggle
                                     ? "Showing Pending/Denied"
-                                    : "Show All"
+                                    : "Show Pending/ Denied"
                                 : toggle
                                     ? "Showing My Stories"
                                     : "Show My Stories"
@@ -102,18 +102,6 @@ export default function List({ stories, auth }) {
                                     />
                                 </div>
 
-                                {story.is_owner && (
-                                    <button
-                                        onClick={() => handleToggle(story.id)}
-                                        className={`absolute top-4 right-4 px-3 py-1 rounded text-sm font-medium transition-colors duration-200
-                                            ${story.is_active
-                                                ? "bg-green-500 text-white hover:bg-green-600"
-                                                : "bg-gray-400 text-black hover:bg-gray-500"
-                                            }`}
-                                    >
-                                        {story.is_active ? "Active" : "Inactive"}
-                                    </button>
-                                )}
                             </div>
                         ))}
                     </div>
