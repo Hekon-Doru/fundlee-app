@@ -9,24 +9,24 @@ export default function List({ stories, auth }) {
     const { put } = useForm();
     const user = auth.user;
     const isAdmin = user?.role === "admin";
-    const [toggle, setToggle] = useState(false); 
+    const [toggle, setToggle] = useState(false);
 
     const Layout = user ? AuthenticatedLayout : GuestLayout;
 
     let filteredStories = stories.filter((story) => {
-        if (isAdmin) return true; 
-        if (story.status === "approved") return true; 
-        if (user && story.user_id === user.id) return true; 
+        if (isAdmin) return true;
+        if (story.status === "approved") return true;
+        if (user && story.user_id === user.id) return true;
         return false;
     });
 
     const displayedStories = isAdmin
         ? toggle
-            ? filteredStories.filter((story) => story.status !== "approved") 
-            : filteredStories 
+            ? filteredStories.filter((story) => story.status !== "approved")
+            : filteredStories
         : toggle
-        ? filteredStories.filter((story) => story.is_owner) 
-        : filteredStories; 
+        ? filteredStories.filter((story) => story.is_owner)
+        : filteredStories;
 
     const handleToggle = (storyId) => put(route("story.toggle", storyId));
 
@@ -34,31 +34,38 @@ export default function List({ stories, auth }) {
         <Layout
             user={user ? { name: user.name } : null}
             header={
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                        All Stories
-                    </h2>
+                <nav aria-label="Breadcrumb" className="w-full">
+                    <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between text-sm">
+                        <ol className="flex items-center gap-2 text-gray-500">
+                            <li>
+                                <span className="font-medium text-green-600 hover:text-green-700 transition-colors">
+                                    All Stories
+                                </span>
+                            </li>
+                        </ol>
 
-                    {user && (
-                        <button
-                            onClick={() => setToggle(!toggle)}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200
-                                ${
-                                    toggle
-                                        ? "bg-blue-600 text-white hover:bg-blue-700"
-                                        : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-                                }`}
-                        >
-                            {isAdmin
-                                ? toggle
-                                    ? "Showing Pending/Denied"
-                                    : "Show Pending/ Denied"
-                                : toggle
-                                ? "Showing My Stories"
-                                : "Show My Stories"}
-                        </button>
-                    )}
-                </div>
+                        {/* Toggle Button */}
+                        {user && (
+                            <button
+                                onClick={() => setToggle(!toggle)}
+                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200
+                            ${
+                                toggle
+                                    ? "bg-blue-600 text-white hover:bg-blue-700"
+                                    : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                            }`}
+                            >
+                                {isAdmin
+                                    ? toggle
+                                        ? "Showing Pending/Denied"
+                                        : "Show Pending/Denied"
+                                    : toggle
+                                    ? "Showing My Stories"
+                                    : "Show My Stories"}
+                            </button>
+                        )}
+                    </div>
+                </nav>
             }
         >
             <div className="max-w-7xl mx-auto py-12">

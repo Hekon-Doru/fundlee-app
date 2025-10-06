@@ -14,6 +14,7 @@ class Donation extends Model
         'user_id',
         'donor_name',
         'amount',
+        'comment',
     ];
 
     // Relationships

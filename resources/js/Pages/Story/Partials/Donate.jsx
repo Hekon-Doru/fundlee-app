@@ -6,6 +6,7 @@ export default function Donate({ story, authUser, onClose, onDonateSuccess }) {
     const [amount, setAmount] = useState("");
     const [donorName, setDonorName] = useState(authUser ? authUser.name : "");
     const [anonymous, setAnonymous] = useState(false);
+    const [comment, setComment] = useState(""); // New comment state
     const [success, setSuccess] = useState(false);
 
     useEffect(() => {
@@ -28,15 +29,16 @@ export default function Donate({ story, authUser, onClose, onDonateSuccess }) {
             {
                 amount: parseFloat(amount),
                 donor_name: donorName,
+                comment: comment || null, // Send comment to backend
             },
             {
                 preserveScroll: true,
                 onSuccess: (page) => {
-                    // Get new donation object returned by server
                     const newDonation = page.props.donation || {
-                        id: Date.now(), // fallback if server does not return ID
+                        id: Date.now(),
                         donor_name: donorName,
                         amount: parseFloat(amount),
+                        comment: comment || null,
                     };
 
                     setSuccess(true);
@@ -47,6 +49,7 @@ export default function Donate({ story, authUser, onClose, onDonateSuccess }) {
                         onClose();
                         setAmount("");
                         setAnonymous(false);
+                        setComment(""); // Reset comment
                     }, 1200);
                 },
             }
@@ -77,17 +80,12 @@ export default function Donate({ story, authUser, onClose, onDonateSuccess }) {
                             <h3 className="text-lg font-semibold mb-4">
                                 Donate to "{story.title}"
                             </h3>
-                            <form
-                                onSubmit={submitDonation}
-                                className="flex flex-col gap-3"
-                            >
+                            <form onSubmit={submitDonation} className="flex flex-col gap-3">
                                 <div className="flex flex-col gap-2">
                                     <input
                                         type="text"
                                         value={donorName}
-                                        onChange={(e) =>
-                                            setDonorName(e.target.value)
-                                        }
+                                        onChange={(e) => setDonorName(e.target.value)}
                                         placeholder="Your name"
                                         className="px-3 py-2 border rounded"
                                         required
@@ -97,13 +95,18 @@ export default function Donate({ story, authUser, onClose, onDonateSuccess }) {
                                         <input
                                             type="checkbox"
                                             checked={anonymous}
-                                            onChange={(e) =>
-                                                setAnonymous(e.target.checked)
-                                            }
+                                            onChange={(e) => setAnonymous(e.target.checked)}
                                         />
                                         Donate anonymously
                                     </label>
                                 </div>
+
+                                <textarea
+                                    value={comment}
+                                    onChange={(e) => setComment(e.target.value)}
+                                    placeholder="Leave a comment (optional)"
+                                    className="px-3 py-2 border rounded resize-none h-20"
+                                />
 
                                 <input
                                     type="number"

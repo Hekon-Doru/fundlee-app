@@ -207,6 +207,7 @@ class StoryController extends Controller
             'user_id' => auth()->id(),
             'donor_name' => $donorName,
             'amount' => $request->amount,
+            'comment' => $request->comment,
         ]);
 
         $story->increment('collected_amount', $request->amount);

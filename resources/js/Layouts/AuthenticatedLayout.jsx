@@ -8,7 +8,7 @@ export default function AuthenticatedLayout({ header, children }) {
     return (
         <div className="bg-gradient-to-br from-green-50 to-blue-50 min-h-screen flex flex-col">
             {/* Header */}
-            <header className="flex justify-between items-center py-6 px-6 md:px-12 bg-white shadow-md rounded-b-3xl">
+            <header className="flex justify-between items-center py-6 px-6 md:px-12 bg-white shadow-md">
                 <Link
                     href={route("story.list")}
                     className="text-2xl font-bold text-green-500 hover:text-green-600 transition"
@@ -60,7 +60,7 @@ export default function AuthenticatedLayout({ header, children }) {
             </header>
 
             {header && (
-                <div className="bg-white shadow rounded-3xl mt-6 mx-6 md:mx-12 p-6">
+                <div className="bg-white shadow mt-1">
                     {header}
                 </div>
             )}
