@@ -23,13 +23,13 @@ export function OwnerActions({ story }) {
             <div className="flex gap-3">
                 <button
                     onClick={editStory}
-                    className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 shadow-sm transition"
+                    className="px-4 w-full py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 shadow-sm transition"
                 >
                     Edit
                 </button>
                 <button
                     onClick={() => setConfirmingDelete(true)}
-                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 shadow-sm transition"
+                    className="px-4 w-full py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 shadow-sm transition"
                 >
                     Delete
                 </button>

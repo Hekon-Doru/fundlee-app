@@ -1,6 +1,6 @@
 import { router } from "@inertiajs/react";
 
-export function AdminActions({ story, updateStatus}) {
+export function AdminActions({ story, updateStatus }) {
     const handleStatusChange = (status) => {
         router.put(
             route("story.updateStatus", story.id),
@@ -14,20 +14,37 @@ export function AdminActions({ story, updateStatus}) {
         );
     };
 
+    const buttons = [
+        {
+            label: "Approve",
+            status: "approved",
+            color: "bg-green-600 hover:bg-green-700",
+        },
+        {
+            label: "Pending",
+            status: "pending",
+            color: "bg-yellow-500 hover:bg-yellow-600",
+        },
+        {
+            label: "Deny",
+            status: "rejected",
+            color: "bg-red-600 hover:bg-red-700",
+        },
+    ];
+
     return (
-        <div className="flex gap-3">
-            <button
-                 onClick={() => handleStatusChange("approved")}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 shadow-sm transition"
-            >
-                Approve
-            </button>
-            <button
-                onClick={() => handleStatusChange("rejected")}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 shadow-sm transition"
-            >
-                Deny
-            </button>
+        <div className="flex gap-3 w-full">
+            {buttons
+                .filter((btn) => btn.status !== story.status) // ✅ show only not selected
+                .map((btn) => (
+                    <button
+                        key={btn.status}
+                        onClick={() => handleStatusChange(btn.status)}
+                        className={`px-4 py-2 w-full text-white rounded-lg shadow-sm transition ${btn.color}`}
+                    >
+                        {btn.label}
+                    </button>
+                ))}
         </div>
     );
 }

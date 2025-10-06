@@ -10,40 +10,50 @@ export default function StoryActions({
 }) {
     if (!story) return null;
 
+    const isGuest = !authUser;
     const isAdmin = authUser?.role === "admin";
-    const isOwner = story.owner;
+    const isOwner = authUser && story.user_id === authUser.id;
+    const isRegularUser = authUser && !isAdmin && !isOwner; // ✅ new condition
 
     switch (story.status) {
         case "pending":
             if (isAdmin) {
-                return (
-                    <AdminActions story={story} updateStatus={updateStatus} />
-                );
+                return <AdminActions story={story} updateStatus={updateStatus} />;
             }
             if (isOwner) {
-                return <OwnerActions story={story} />; // Owner can Edit/Delete
+                return <OwnerActions story={story} />;
             }
             return null;
 
         case "approved":
-           
-            return (
-                <UserActions
-                    story={story}
-                    authUser={authUser}
-                    setShowDonate={setShowDonate}
-                    updateStatus={updateStatus}
-                />
-            );
+            // ✅ Allow guests + regular users to donate
+            if (isGuest || isRegularUser) {
+                return (
+                    <UserActions
+                        story={story}
+                        authUser={authUser}
+                        setShowDonate={setShowDonate}
+                        updateStatus={updateStatus}
+                    />
+                );
+            }
+
+            // Admins or owners get management options
+            if (isAdmin) {
+                return <AdminActions story={story} updateStatus={updateStatus} />;
+            }
+            if (isOwner) {
+                return <OwnerActions story={story} />;
+            }
+
+            return null;
 
         case "rejected":
             if (isAdmin) {
-                return (
-                    <AdminActions story={story} updateStatus={updateStatus} />
-                );
+                return <AdminActions story={story} updateStatus={updateStatus} />;
             }
             if (isOwner) {
-                return <OwnerActions story={story} />; // Owner can Edit/Delete
+                return <OwnerActions story={story} />;
             }
             return null;
 
