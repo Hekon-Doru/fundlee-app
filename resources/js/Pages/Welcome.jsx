@@ -64,7 +64,21 @@ export default function Welcome({ auth, stories }) {
                 </header>
 
                 {/* Hero Section */}
-                <section className="flex flex-col items-center justify-center text-center px-6 md:px-12 h-full bg-gradient-to-b from-green-700/20 to-yellow-100/20 dark:from-gray-800/20"></section>
+                <section className="flex flex-col items-center justify-center text-center px-6 md:px-12 h-screen bg-gradient-to-b from-green-700/20 to-yellow-100/20 dark:from-gray-800/20">
+                    <h1 className="text-4xl md:text-6xl font-bold text-green-900 dark:text-green-300 mb-4">
+                        Share your true story.
+                    </h1>
+                    <p className="text-lg md:text-2xl text-gray-700 dark:text-gray-300 mb-8 max-w-xl">
+                        Every great journey begins with a single step. Each
+                        person can help you achieve your goal.
+                    </p>
+                    <a
+                        href="/register"
+                        className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transition duration-300"
+                    >
+                        Share your story.
+                    </a>
+                </section>
 
                 {/* Resources Grid */}
                 <section className="px-6 md:px-12 py-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3"></section>
