@@ -13,12 +13,14 @@ export default function StoryActions({
     const isGuest = !authUser;
     const isAdmin = authUser?.role === "admin";
     const isOwner = authUser && story.user_id === authUser.id;
-    const isRegularUser = authUser && !isAdmin && !isOwner; // ✅ new condition
+    const isRegularUser = authUser && !isAdmin && !isOwner; 
 
     switch (story.status) {
         case "pending":
             if (isAdmin) {
-                return <AdminActions story={story} updateStatus={updateStatus} />;
+                return (
+                    <AdminActions story={story} updateStatus={updateStatus} />
+                );
             }
             if (isOwner) {
                 return <OwnerActions story={story} />;
@@ -26,7 +28,6 @@ export default function StoryActions({
             return null;
 
         case "approved":
-            // ✅ Allow guests + regular users to donate
             if (isGuest || isRegularUser) {
                 return (
                     <UserActions
@@ -40,7 +41,9 @@ export default function StoryActions({
 
             // Admins or owners get management options
             if (isAdmin) {
-                return <AdminActions story={story} updateStatus={updateStatus} />;
+                return (
+                    <AdminActions story={story} updateStatus={updateStatus} />
+                );
             }
             if (isOwner) {
                 return <OwnerActions story={story} />;
@@ -50,7 +53,9 @@ export default function StoryActions({
 
         case "rejected":
             if (isAdmin) {
-                return <AdminActions story={story} updateStatus={updateStatus} />;
+                return (
+                    <AdminActions story={story} updateStatus={updateStatus} />
+                );
             }
             if (isOwner) {
                 return <OwnerActions story={story} />;

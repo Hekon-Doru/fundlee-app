@@ -58,7 +58,6 @@ export default function Create({ auth }) {
         >
             <div className="max-w-3xl mx-auto mt-10 bg-white p-8 rounded-xl shadow-lg">
                 <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-                    {/* Title */}
                     <div>
                         <label className="block mb-1 font-semibold text-gray-700">
                             Title
@@ -131,7 +130,6 @@ export default function Create({ auth }) {
                         )}
                     </div>
 
-                    {/* Description */}
                     <div>
                         <label className="block mb-1 font-semibold text-gray-700">
                             Description
@@ -152,7 +150,6 @@ export default function Create({ auth }) {
                         )}
                     </div>
 
-                    {/* Submit */}
                     <button
                         type="submit"
                         disabled={processing}

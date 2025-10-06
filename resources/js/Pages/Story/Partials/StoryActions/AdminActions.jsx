@@ -8,7 +8,7 @@ export function AdminActions({ story, updateStatus }) {
             {
                 preserveScroll: true,
                 onSuccess: () => {
-                    updateStatus(status); // update local state instantly
+                    updateStatus(status); 
                 },
             }
         );
@@ -35,7 +35,7 @@ export function AdminActions({ story, updateStatus }) {
     return (
         <div className="flex gap-3 w-full">
             {buttons
-                .filter((btn) => btn.status !== story.status) // ✅ show only not selected
+                .filter((btn) => btn.status !== story.status)
                 .map((btn) => (
                     <button
                         key={btn.status}

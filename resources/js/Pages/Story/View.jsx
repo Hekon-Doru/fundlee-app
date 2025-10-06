@@ -63,7 +63,6 @@ export default function View({ story: initialStory, auth }) {
                         )}
                     </div>
 
-                    {/* Story Info */}
                     <div className="w-full lg:w-5/12 flex flex-col gap-4">
                         <div>
                             <div className="flex items-center text-gray-700 text-sm mb-2">
@@ -79,15 +78,18 @@ export default function View({ story: initialStory, auth }) {
                             />
                         </div>
 
-                        {/* Actions (Donate button included for guests) */}
                         <StoryActions
                             story={story}
                             authUser={authUser}
                             setShowDonate={setShowDonate}
-                            updateStatus={(newStatus) => setStory((prev) => ({ ...prev, status: newStatus }))}
+                            updateStatus={(newStatus) =>
+                                setStory((prev) => ({
+                                    ...prev,
+                                    status: newStatus,
+                                }))
+                            }
                         />
 
-                        {/* Story Description */}
                         <div>
                             <h3 className="mt-6 text-lg font-semibold mb-2">
                                 {story.title}
@@ -98,10 +100,8 @@ export default function View({ story: initialStory, auth }) {
                 </div>
             </div>
 
-            {/* Contributors */}
             <Contributors story={story} />
 
-            {/* Donate Modal */}
             {showDonate && (
                 <Donate
                     story={story}

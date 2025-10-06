@@ -8,7 +8,6 @@ export default function Donate({ story, authUser, onClose, onDonateSuccess }) {
     const [anonymous, setAnonymous] = useState(false);
     const [success, setSuccess] = useState(false);
 
-    // Update name if anonymous is checked
     useEffect(() => {
         if (anonymous) {
             setDonorName("Anonymous");
@@ -78,12 +77,17 @@ export default function Donate({ story, authUser, onClose, onDonateSuccess }) {
                             <h3 className="text-lg font-semibold mb-4">
                                 Donate to "{story.title}"
                             </h3>
-                            <form onSubmit={submitDonation} className="flex flex-col gap-3">
+                            <form
+                                onSubmit={submitDonation}
+                                className="flex flex-col gap-3"
+                            >
                                 <div className="flex flex-col gap-2">
                                     <input
                                         type="text"
                                         value={donorName}
-                                        onChange={(e) => setDonorName(e.target.value)}
+                                        onChange={(e) =>
+                                            setDonorName(e.target.value)
+                                        }
                                         placeholder="Your name"
                                         className="px-3 py-2 border rounded"
                                         required
@@ -93,7 +97,9 @@ export default function Donate({ story, authUser, onClose, onDonateSuccess }) {
                                         <input
                                             type="checkbox"
                                             checked={anonymous}
-                                            onChange={(e) => setAnonymous(e.target.checked)}
+                                            onChange={(e) =>
+                                                setAnonymous(e.target.checked)
+                                            }
                                         />
                                         Donate anonymously
                                     </label>

@@ -8,12 +8,11 @@ export default function Edit({ story, auth }) {
         target_amount: story.target_amount || "",
         description: story.description || "",
         image: null,
-        _method: "PUT", // method spoofing for Laravel PUT
+        _method: "PUT",
     });
 
     const [preview, setPreview] = useState(story.image_path || null);
 
-    // Clean up preview URL when component unmounts
     useEffect(() => {
         return () => {
             if (preview && preview.startsWith("blob:")) {
@@ -44,14 +43,11 @@ export default function Edit({ story, auth }) {
         <AuthenticatedLayout
             user={auth.user ? { name: auth.user.name } : null}
             header={
-                <h2 className="text-2xl font-bold text-gray-800">
-                    Edit Story
-                </h2>
+                <h2 className="text-2xl font-bold text-gray-800">Edit Story</h2>
             }
         >
             <div className="max-w-3xl mx-auto mt-10 bg-white p-8 rounded-xl shadow-lg">
                 <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-                    {/* Title */}
                     <div>
                         <label className="block mb-1 font-semibold text-gray-700">
                             Title
@@ -71,7 +67,6 @@ export default function Edit({ story, auth }) {
                         )}
                     </div>
 
-                    {/* Goal */}
                     <div>
                         <label className="block mb-1 font-semibold text-gray-700">
                             Goal (€)
@@ -93,7 +88,6 @@ export default function Edit({ story, auth }) {
                         )}
                     </div>
 
-                    {/* Image Upload */}
                     <div>
                         <label className="block mb-1 font-semibold text-gray-700">
                             Story Image
@@ -124,7 +118,6 @@ export default function Edit({ story, auth }) {
                         )}
                     </div>
 
-                    {/* Description */}
                     <div>
                         <label className="block mb-1 font-semibold text-gray-700">
                             Description
@@ -145,7 +138,6 @@ export default function Edit({ story, auth }) {
                         )}
                     </div>
 
-                    {/* Submit */}
                     <button
                         type="submit"
                         disabled={processing}
