@@ -43,7 +43,17 @@ export default function Edit({ story, auth }) {
         <AuthenticatedLayout
             user={auth.user ? { name: auth.user.name } : null}
             header={
-                <h2 className="text-2xl font-bold text-gray-800">Edit Story</h2>
+                <nav aria-label="Breadcrumb" className="w-full">
+                    <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between text-sm">
+                        <ol className="flex items-center gap-2 text-gray-500">
+                            <li>
+                                <span className="font-medium text-green-600 hover:text-green-700 transition-colors">
+                                    Edit a story.
+                                </span>
+                            </li>
+                        </ol>
+                    </div>
+                </nav>
             }
         >
             <div className="max-w-3xl mx-auto mt-10 bg-white p-8 rounded-xl shadow-lg">

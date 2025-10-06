@@ -93,6 +93,7 @@ class StoryController extends Controller
         $story->title = $request->title;
         $story->target_amount = $request->target_amount;
         $story->description = $request->description;
+        $story->status = 'pending';
 
         if ($request->hasFile('image')) {
 

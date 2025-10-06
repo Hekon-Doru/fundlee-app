@@ -15,11 +15,6 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-// Auth Routes: 
 Route::middleware('auth')->group(function () {
 
     Route::get('/story/create', [StoryController::class, 'create'])->name('story.create');
