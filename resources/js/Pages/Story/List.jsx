@@ -22,7 +22,7 @@ export default function List({ stories, auth }) {
 
     const displayedStories = isAdmin
         ? toggle
-            ? filteredStories.filter((story) => story.status !== "approved")
+            ? filteredStories.filter((story) => story.status === "pending")
             : filteredStories
         : toggle
         ? filteredStories.filter((story) => story.is_owner)
